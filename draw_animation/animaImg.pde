@@ -9,18 +9,16 @@ class Ani {
   boolean cType, cState;
 
   Ani() {
-    maxS = 5;
-    ani = new Animation[2][maxS];
+    maxS = 4;
+    ani = new Animation[4][maxS];
 
-    for (int i = 0; i < maxS; i++) {
-      ani[0][i] = new Animation("animationtest02.png", 3, i*w, 0);
+    for (int j = 0; j < 4; j++) {
+      for (int i = 0; i < maxS; i++) {
+        ani[j][i] = new Animation("spritesprova.png", 4, i*w, j*h);
+      }
     }
 
-    for (int i = 0; i < maxS; i++) {
-      ani[1][i] = new Animation("animationtest02.png", 3, (i+2)*w, 0);
-    }
-
-    state = 2;
+    state = 0;
     type  = 0;
     snext = 0;
     tnext = 0;
@@ -28,32 +26,38 @@ class Ani {
 
   void update() {
 
-    
+
     if (ani[type][state].frame == 0) {
-      state = snext;
-      type = tnext;
+      if (state != snext) {
+        state = snext;
+        type = 1;
+      }
+      if (tnext != type) {
+        type = tnext;
+        tnext = 0;
+      }
     }
   }
 
   void display() {
-    ani[type][state].display();
+    ani[type][(type == 4) ? state - 1: state].display();
+    println("state: " + state + " type: " + type);
   }
 
   void changeState(int  st) {
 
     if (st > 0) {
 
-      state = min(maxS,(state+st));
-      
+      snext = min(maxS-1, (state+st));
     } 
     else {
 
-      state = max(0,(state+st));
+      snext = max(0, (state+st));
     }
-
   }
 
-  void changeType() {
+  void changeType(int typ) {
+    tnext = typ;
   }
 }
 
@@ -68,13 +72,14 @@ class Animation {
   Animation(String filename, int count, int initX, int initY) {
     imageCount = count;
     imgs = new PImage[imageCount];
-    xpos = width/2; 
-    ypos = height/2;
+    xpos = w/2; 
+    ypos = h/2;
+    frame = 0;
 
-    PImage IMG = loadImage(filename);
+    PImage IMG = loadImage(filename,"png");
 
     for (int i = 0; i < imageCount; i++) {
-      imgs[i] = new PImage(w, h); 
+      imgs[i] = new PImage(w, h,ARGB); 
       imgs[i].copy(IMG, initX, i*h, w, h, 0, 0, w, h);
     }
   }
